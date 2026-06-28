@@ -127,3 +127,19 @@ Open your browser and navigate to:
 3. **Interactive Paint Brushes**: Select the **"Green Brush"** or **"Cool Roof Brush"** from the canvas toolbar, click-and-drag paint directly onto the map to visually inspect temperatures drop in real time.
 4. **Wind Corridor Flow Toggle**: Turn on **"Wind Flow"** to animate particles showing how wind streams are guided through canals or blocked by tall buildings.
 5. **AI Optimizer**: Specify a dollar budget limit and strategy (Physical Cooling, Social Heat Equity, or Balanced), click **"Run AI Optimizer"** to solve for the optimal strategic spatial placement. Click nodes on the **Pareto Frontier chart** to change budget levels.
+
+---
+
+## 📷 Visual Walkthrough & Screenshots
+
+### 1. Interactive Heat Mitigation Dashboard
+Deep-slate dark interface displaying LST (Surface) coordinate heatmaps alongside microclimate profile boundary selectors.
+![Dashboard Overview](assets/dashboard_view.png)
+
+### 2. Grid Cell Inspector & Explainable AI
+Clicking cells plots local driver attributions (SHAP contributions) and updates the animated 2.5D street canyon model dynamically.
+![Canyon and Driver Inspector](assets/inspector_view.png)
+
+### 3. Arid Microclimates & Urban Heat Susceptibility
+Toggling alternate profiles (e.g. Delhi) to analyze thermal impacts under low humidity and extreme solar radiational forcings.
+![Arid Microclimate Profile](assets/delhi_archetype.png)
