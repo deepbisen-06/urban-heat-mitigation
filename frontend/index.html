@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoHeat - Urban Heat Mitigation AI Engine</title>
+    <!-- Google Fonts: Outfit -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="main-header">
+            <div class="brand">
+                <i class="fa-solid fa-temperature-arrow-down brand-icon"></i>
+                <div class="brand-text">
+                    <h1>GeoHeat AI</h1>
+                    <span>Physics-Informed Urban Cool Strategy Engine</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <div class="profile-indicator">
+                    <span id="current-profile-badge" class="badge">Dense High-Rise</span>
+                </div>
+                <div class="github-link">
+                    <i class="fa-brands fa-github"></i>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Layout -->
+        <main class="dashboard-grid">
+            <!-- Sidebar Panel: Inputs, Profiles, Budget -->
+            <section class="sidebar glass-panel">
+                <div class="section-title">
+                    <i class="fa-solid fa-sliders"></i>
+                    <h2>Configuration Panel</h2>
+                </div>
+
+                <!-- City Profiles -->
+                <div class="control-group">
+                    <label class="control-label">Urban Archetype</label>
+                    <div class="archetype-buttons">
+                        <button class="btn btn-tab active" data-profile="dense_highrise">
+                            <i class="fa-solid fa-city"></i> Singapore
+                        </button>
+                        <button class="btn btn-tab" data-profile="arid_inland">
+                            <i class="fa-solid fa-sun-plant-wilt"></i> Delhi
+                        </button>
+                        <button class="btn btn-tab" data-profile="tropical_coastal">
+                            <i class="fa-solid fa-water"></i> Mumbai
+                        </button>
+                    </div>
+                </div>
+
+                <!-- GIS File Upload -->
+                <div class="control-group">
+                    <label class="control-label">Upload Custom GIS Data</label>
+                    <div class="upload-zone" id="upload-zone">
+                        <i class="fa-solid fa-file-import upload-icon"></i>
+                        <p>Drag & drop CSV / GeoJSON here or <span>browse</span></p>
+                        <input type="file" id="gis-file-input" accept=".csv,.json,.geojson" style="display: none;">
+                    </div>
+                    <div id="upload-status" class="status-msg"></div>
+                </div>
+
+                <!-- Climate Boundary Conditions -->
+                <div class="control-group">
+                    <div class="group-header">
+                        <label class="control-label">Boundary Microclimate</label>
+                        <span class="reset-btn" id="reset-weather-btn"><i class="fa-solid fa-rotate-left"></i> Reset</span>
+                    </div>
+                    
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Air Temp (Noon)</span>
+                            <span class="slider-value" id="val-air-temp">33 °C</span>
+                        </div>
+                        <input type="range" id="input-air-temp" min="20" max="48" step="0.5" value="33">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Relative Humidity</span>
+                            <span class="slider-value" id="val-humidity">75 %</span>
+                        </div>
+                        <input type="range" id="input-humidity" min="0.05" max="0.95" step="0.05" value="0.75">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Wind Speed</span>
+                            <span class="slider-value" id="val-wind">1.5 m/s</span>
+                        </div>
+                        <input type="range" id="input-wind" min="0.5" max="10" step="0.1" value="1.5">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Solar Radiation</span>
+                            <span class="slider-value" id="val-solar">800 W/m²</span>
+                        </div>
+                        <input type="range" id="input-solar" min="200" max="1100" step="25" value="800">
+                    </div>
+                </div>
+
+                <!-- Optimization Suite -->
+                <div class="control-group opt-suite">
+                    <label class="control-label"><i class="fa-solid fa-wand-magic-sparkles"></i> AI Mitigation Optimizer</label>
+                    
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Intervention Budget</span>
+                            <span class="slider-value" id="val-budget">$2.0M</span>
+                        </div>
+                        <input type="range" id="input-budget" min="200000" max="8000000" step="200000" value="2000000">
+                    </div>
+
+                    <div class="slider-container">
+                        <span class="sub-label">Optimization Strategy</span>
+                        <div class="strategy-options">
+                            <label class="radio-label">
+                                <input type="radio" name="opt-strategy" value="efficiency_focused" checked>
+                                <span class="custom-radio"></span>
+                                Physical Cooling Max
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="opt-strategy" value="equity_focused">
+                                <span class="custom-radio"></span>
+                                Social Heat Equity
+                            </label>
+                            <label class="radio-label">
+                                <input type="radio" name="opt-strategy" value="balanced">
+                                <span class="custom-radio"></span>
+                                Balanced Mix
+                            </label>
+                        </div>
+                    </div>
+
+                    <button class="btn btn-primary" id="btn-run-optimization">
+                        <i class="fa-solid fa-gears"></i> Run AI Optimizer
+                    </button>
+                </div>
+            </section>
+
+            <!-- Map View Area: 2D Spatial Dashboard -->
+            <section class="main-map-panel glass-panel">
+                <div class="map-header">
+                    <div class="layer-selector">
+                        <button class="btn btn-layer active" data-layer="temp_surface">LST (Surface)</button>
+                        <button class="btn btn-layer" data-layer="temp_air">Air Temp</button>
+                        <button class="btn btn-layer" data-layer="wbgt">WBGT (Heat Stress)</button>
+                        <button class="btn btn-layer" data-layer="ndvi">NDVI (Greening)</button>
+                        <button class="btn btn-layer" data-layer="albedo">Albedo (Reflectance)</button>
+                        <button class="btn btn-layer" data-layer="svi">Vulnerability (SVI)</button>
+                        <button class="btn btn-layer" data-layer="risk">Heat Risk Map</button>
+                    </div>
+                    <div class="canvas-tools">
+                        <button class="btn btn-tool active" id="btn-tool-inspect" title="Inspect Grid"><i class="fa-solid fa-arrow-pointer"></i> Inspect</button>
+                        <button class="btn btn-tool" id="btn-tool-paint-green" title="Paint Vegetation"><i class="fa-solid fa-tree"></i> Green Brush</button>
+                        <button class="btn btn-tool" id="btn-tool-paint-cool" title="Paint Cool Roof Coating"><i class="fa-solid fa-paint-roller"></i> Cool Roof Brush</button>
+                        <button class="btn btn-tool-toggle" id="btn-toggle-wind" title="Animate Wind Ventilation Flow"><i class="fa-solid fa-wind"></i> Wind Flow</button>
+                    </div>
+                </div>
+
+                <!-- Geospatial Canvas Grid -->
+                <div class="canvas-wrapper">
+                    <div id="map-loading" class="map-overlay-loading hidden">
+                        <div class="spinner"></div>
+                        <span>Calculating Physics Energy Balance...</span>
+                    </div>
+                    <canvas id="gis-grid-canvas"></canvas>
+                </div>
+
+                <!-- Map Legend -->
+                <div class="map-legend">
+                    <span id="legend-label-min">Cool (20°C)</span>
+                    <div class="legend-gradient" id="legend-color-bar"></div>
+                    <span id="legend-label-max">Hot (55°C)</span>
+                </div>
+
+                <!-- Diurnal Simulation Playback Controls -->
+                <div class="diurnal-playback-bar">
+                    <button class="btn btn-playback" id="btn-play-diurnal">
+                        <i class="fa-solid fa-play"></i> Play 24h Cycle
+                    </button>
+                    <div class="playback-slider-container">
+                        <input type="range" id="diurnal-time-slider" min="0" max="23" step="1" value="12">
+                        <div class="time-ticks">
+                            <span>12 AM</span>
+                            <span>6 AM</span>
+                            <span class="active-tick" id="tick-noon">12 PM</span>
+                            <span>6 PM</span>
+                            <span>11 PM</span>
+                        </div>
+                    </div>
+                    <div class="current-time-badge" id="current-playback-time">12:00 PM</div>
+                </div>
+            </section>
+
+            <!-- Right Column: Cell Detail & ROI analytics -->
+            <section class="right-analytics">
+                <!-- Cell Info Panel -->
+                <div class="glass-panel cell-detail-panel">
+                    <div class="section-title">
+                        <i class="fa-solid fa-circle-info"></i>
+                        <h2>Grid Cell Inspector</h2>
+                    </div>
+                    <div id="inspector-placeholder" class="info-placeholder">
+                        <i class="fa-solid fa-arrow-pointer pointer-icon"></i>
+                        <p>Click on any grid cell to inspect its local drivers, parameters, and energy balance.</p>
+                    </div>
+                    <div id="inspector-content" class="inspector-grid hidden">
+                        <div class="metric-row">
+                            <span class="label">Coordinates:</span>
+                            <span class="value" id="cell-coords">N/A</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="label">Land Use:</span>
+                            <span class="value capitalize" id="cell-landuse">N/A</span>
+                        </div>
+
+                        <!-- Dynamic Street Canyon Visualizer -->
+                        <div class="canyon-container">
+                            <h3>Microclimate Street Canyon</h3>
+                            <div class="canyon-canvas-box">
+                                <div class="canyon-sky" id="canyon-sky-bg">
+                                    <div class="sun-icon" id="canyon-sun"><i class="fa-solid fa-sun"></i></div>
+                                </div>
+                                <div class="canyon-scene">
+                                    <div class="canyon-building left-building" id="canyon-left-b">
+                                        <div class="roof" id="canyon-left-roof"></div>
+                                        <div class="building-face"></div>
+                                    </div>
+                                    <div class="canyon-street">
+                                        <div class="street-surface" id="canyon-ground"></div>
+                                        <div class="vegetation-overlay" id="canyon-trees">
+                                            <i class="fa-solid fa-tree tree-1" id="c-tree-1"></i>
+                                            <i class="fa-solid fa-tree tree-2" id="c-tree-2"></i>
+                                        </div>
+                                        <div class="wind-indicator" id="canyon-wind"><i class="fa-solid fa-wind"></i></div>
+                                    </div>
+                                    <div class="canyon-building right-building" id="canyon-right-b">
+                                        <div class="roof" id="canyon-right-roof"></div>
+                                        <div class="building-face"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Mini Gauges / Sliders for Interventions -->
+                        <div class="mitigation-inputs">
+                            <h3>Simulate Custom Intervention</h3>
+                            <div class="manual-slider">
+                                <div class="slider-header">
+                                    <span>Albedo (Roof coating)</span>
+                                    <span class="value-badge" id="val-cell-albedo">0.15</span>
+                                </div>
+                                <input type="range" id="slider-cell-albedo" min="0.05" max="0.75" step="0.02" value="0.15">
+                            </div>
+                            <div class="manual-slider">
+                                <div class="slider-header">
+                                    <span>NDVI (Green cover)</span>
+                                    <span class="value-badge" id="val-cell-ndvi">0.20</span>
+                                </div>
+                                <input type="range" id="slider-cell-ndvi" min="0.00" max="0.85" step="0.05" value="0.20">
+                            </div>
+                        </div>
+
+                        <!-- Energy Balance fluxes (W/m2) -->
+                        <div class="fluxes-panel">
+                            <h3>Surface Energy Balance (W/m²)</h3>
+                            <div class="fluxes-flow">
+                                <div class="flux-card positive">
+                                    <span class="name">Rn (Net Rad)</span>
+                                    <span class="val" id="flux-rn">0</span>
+                                </div>
+                                <div class="flux-card negative">
+                                    <span class="name">H (Sensible)</span>
+                                    <span class="val" id="flux-h">0</span>
+                                </div>
+                                <div class="flux-card negative">
+                                    <span class="name">LE (Latent)</span>
+                                    <span class="val" id="flux-le">0</span>
+                                </div>
+                                <div class="flux-card negative">
+                                    <span class="name">G (Ground)</span>
+                                    <span class="val" id="flux-g">0</span>
+                                </div>
+                            </div>
+                            <div class="thermo-closure" id="flux-closure">
+                                Energy Balance Closure Residual: 0.0 W/m²
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Driver attribution (SHAP explainability) -->
+                <div class="glass-panel drivers-panel">
+                    <div class="section-title">
+                        <i class="fa-solid fa-chart-bar"></i>
+                        <h2>Explainable AI Driver Diagnostics</h2>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="driver-chart"></canvas>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Bottom Panel: ROI Analytics, Pareto Frontier, Diurnal Line Charts -->
+        <section class="bottom-analytics-grid">
+            <!-- ROI Indicators -->
+            <div class="glass-panel roi-summary-panel">
+                <div class="section-title">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <h2>Project ROI & Ecological Impact</h2>
+                </div>
+                <div class="roi-metrics-grid">
+                    <div class="roi-card">
+                        <span class="card-label">Total Capital Cost</span>
+                        <h3 id="roi-capital-cost">$0</h3>
+                        <span class="card-desc">Greening + Cool coating</span>
+                    </div>
+                    <div class="roi-card">
+                        <span class="card-label">Annual Bill Savings</span>
+                        <h3 id="roi-energy-savings">$0</h3>
+                        <span class="card-desc" id="roi-energy-kwh">0 kWh saved / yr</span>
+                    </div>
+                    <div class="roi-card">
+                        <span class="card-label">Carbon Offset</span>
+                        <h3 id="roi-carbon-saved">0 Tons</h3>
+                        <span class="card-desc" id="roi-carbon-value">$0 / yr offset value</span>
+                    </div>
+                    <div class="roi-card">
+                        <span class="card-label">Payback Period</span>
+                        <h3 id="roi-payback">0.0 Years</h3>
+                        <span class="card-desc" id="roi-percentage">ROI: 0% / yr</span>
+                    </div>
+                    <div class="roi-card">
+                        <span class="card-label">Stormwater Retained</span>
+                        <h3 id="roi-stormwater">0 m³</h3>
+                        <span class="card-desc" id="roi-stormwater-value">$0 / yr savings</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pareto Frontier Curve -->
+            <div class="glass-panel pareto-frontier-panel">
+                <div class="section-title">
+                    <i class="fa-solid fa-circle-nodes"></i>
+                    <h2>Pareto Frontier: Cost vs. Energy Savings</h2>
+                </div>
+                <div class="chart-container bottom-chart">
+                    <canvas id="pareto-chart"></canvas>
+                </div>
+            </div>
+
+            <!-- Diurnal Simulation curves -->
+            <div class="glass-panel diurnal-panel">
+                <div class="section-title">
+                    <i class="fa-solid fa-clock"></i>
+                    <h2>Diurnal Microclimate (Baseline vs. Cooled)</h2>
+                </div>
+                <div class="chart-container bottom-chart">
+                    <canvas id="diurnal-chart"></canvas>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- App JavaScript -->
+    <script src="app.js"></script>
+</body>
+</html>
